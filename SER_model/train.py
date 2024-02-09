@@ -34,7 +34,7 @@ if __name__ == "__main__":
     classifier = IemoClassifier(num_classes=7) if data_type == "iemocap" else RavClassifier(num_classes=8)
     model = nn.Sequential(FeatureModel(), classifier).to(device)
 
-    # Freeze the FeatureModel if few-shot learning
+    # Freeze the FeatureModel if you want to finetune
     if actemo_finetune:
         model.load_state_dict(torch.load(model_path, map_location=device))
         for param in model[0].parameters():
@@ -58,7 +58,11 @@ if __name__ == "__main__":
         progress_bar = tqdm(enumerate(train_dataloader))
 
         # Set model into training mode
-        model.train()
+        if actemo_finetune:
+            model[0].eval()
+            model[1].train()
+        else:
+            model.train()
         for iteration, data in progress_bar:
             # Extract feature and emotion from the dataloader
             feature, emotion = data

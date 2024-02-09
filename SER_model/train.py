@@ -1,4 +1,4 @@
-from datasets.dataset import IemoCapDataset, RavdessDataset
+from datasets.dataset import IemoCapDataset, RavdessDataset, ActemoDataset
 from torch.utils.data import DataLoader
 import torch
 import torch.nn as nn
@@ -7,12 +7,18 @@ import torch.nn.functional as F
 from tqdm import tqdm
 
 if __name__ == "__main__":
-    # You should define your own Feature CSV file path
-    data_type = "iemocap"
+    # Custom Input
+    data_type = "actemo"
+    actemo_finetune = True
+    model_path = './test_data/best_model_iemocap.pth'
+
+    # Load the dataset
     if data_type == "iemocap":
         dataset = IemoCapDataset("./datasets/iemocap_features.csv")
     elif data_type == "ravdess":
         dataset = RavdessDataset("./datasets/ravdess_features.csv")
+    elif data_type == "actemo":
+        dataset = ActemoDataset("./datasets/actemo_features.csv")
     else:
         raise ValueError("Invalid data type")
 
@@ -27,7 +33,16 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     classifier = IemoClassifier(num_classes=7) if data_type == "iemocap" else RavClassifier(num_classes=8)
     model = nn.Sequential(FeatureModel(), classifier).to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+
+    # Freeze the FeatureModel if few-shot learning
+    if actemo_finetune:
+        model.load_state_dict(torch.load(model_path, map_location=device))
+        for param in model[0].parameters():
+            param.requires_grad = False
+        parameters_to_train = model[1].parameters()
+    else:
+        parameters_to_train = model.parameters()
+    optimizer = torch.optim.Adam(parameters_to_train, lr=1e-4)
 
     # Train/Val Accuracy Logging
     best_train_acc = {"epoch": 0, "acc": 0}

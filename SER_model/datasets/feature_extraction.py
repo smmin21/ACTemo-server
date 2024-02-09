@@ -6,27 +6,36 @@ import tqdm as tqdm
 import torchaudio
 import os
 import pdb
+from time import time
 
 
 
 def extract_features(data, sample_rate):
     # ZCR
+    # zcr_time = time()
     result = np.array([])
     zcr = np.mean(librosa.feature.zero_crossing_rate(y=data).T, axis=0)
     result=np.hstack((result, zcr)) # stacking horizontally
+    # print(f"ZCR Time: {time() - zcr_time}")
 
     # Chroma_stft
+    # chroma_time = time()
     stft = np.abs(librosa.stft(data))
     chroma_stft = np.mean(librosa.feature.chroma_stft(S=stft, sr=sample_rate).T, axis=0)
     result = np.hstack((result, chroma_stft)) # stacking horizontally
+    # print(f"Chroma Time: {time() - chroma_time}")
 
     # MFCC
+    # mfcc_time = time()
     mfcc = np.mean(librosa.feature.mfcc(y=data, sr=sample_rate).T, axis=0)
     result = np.hstack((result, mfcc)) # stacking horizontally
+    # print(f"MFCC Time: {time() - mfcc_time}")
 
     # MelSpectogram
+    # mel_time = time()
     mel = np.mean(librosa.feature.melspectrogram(y=data, sr=sample_rate).T, axis=0)
     result = np.hstack((result, mel)) # stacking horizontally
+    # print(f"Mel Time: {time() - mel_time}")
     
     return result
 

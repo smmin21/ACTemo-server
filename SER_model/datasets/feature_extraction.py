@@ -6,11 +6,13 @@ import tqdm as tqdm
 import torchaudio
 import os
 import pdb
-from time import time
+from time import time, ctime
+import threading
 
 
 
 def extract_features(data, sample_rate):
+    total_time = time()
     # ZCR
     # zcr_time = time()
     result = np.array([])
@@ -37,7 +39,12 @@ def extract_features(data, sample_rate):
     result = np.hstack((result, mel)) # stacking horizontally
     # print(f"Mel Time: {time() - mel_time}")
     
+    # print process/thread name & time
+    print(f"Process {os.getpid()}", f"Thread {threading.current_thread().name}", ctime(), f"Time: {time() - total_time}")
     return result
+
+def extract_features_parallel(data, sample_rate, features_list):
+    features_list.put(extract_features(data, sample_rate))
 
 def create_dataframe(path):
     data = []

@@ -8,7 +8,7 @@ FROM pytorch/pytorch:latest
 WORKDIR /root
 
 # Installs additional packages
-RUN pip install numpy pandas librosa tqdm torchaudio 
+RUN pip install numpy pandas librosa tqdm torchaudio fastapi uvicorn python-multipart
 
 # Downloads training data
 # RUN curl https://example-url/path-to-data/data-filename --output /root/data-filename
@@ -18,4 +18,6 @@ COPY . /root/code
 
 # Sets up the entry point to invoke the trainer.
 WORKDIR /root/code
-ENTRYPOINT ["python", "test.py"]
+# run following command
+# uvicorn app:app --host 0.0.0.0 --port 8000
+ENTRYPOINT ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]

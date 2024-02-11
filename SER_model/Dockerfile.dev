@@ -1,14 +1,14 @@
 # 1. 도커 이미지 빌드
 # docker build -f Dockerfile.dev -t actemo:dev .
 # 2. 도커 컨테이너 실행
-# docker run -it --rm --name actemo-dev -v $(pwd):/root/code actemo:dev /bin/bash
+# docker run -it --rm --name actemo-dev -p 8000:8000 -v $(pwd):/root/code actemo:dev /bin/bash
 
 # Specifies base image and tag
 FROM pytorch/pytorch:latest
 WORKDIR /root
 
 # Installs additional packages
-RUN pip install numpy pandas librosa tqdm torchaudio 
+RUN pip install numpy pandas librosa tqdm torchaudio fastapi uvicorn python-multipart
 
 # Downloads training data
 # RUN curl https://example-url/path-to-data/data-filename --output /root/data-filename

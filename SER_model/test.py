@@ -109,43 +109,45 @@ def multithreading_method(waveform_chunks, rate, features_list):
         thread.join()
     return features_list
 
+def run_test(data_path):
+    time_per_data = time()
+    # Custom Input
+    train_data_type = 'iemocap'
+    emotions_list = ['ang', 'hap', 'exc', 'sad', 'neu', 'fea', 'sur']
+    model_path = './test_data/best_model_iemocap.pth'
+    parallel = 'threading'
+
+    # Extract features from the audio
+    feature_extraction_start = time()
+    if parallel:
+        features_list = extract_features_from_audio_parallel(data_path, parallel)
+    else:
+        features_list = extract_features_from_audio(data_path)
+    feature = torch.tensor(np.array(features_list), dtype=torch.float32)
+    print(f"Feature extraction: {time()-feature_extraction_start:.2f} seconds")
+
+    # Define the model, device
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    classifier = IemoClassifier(num_classes=7) if train_data_type == "iemocap" else RavClassifier(num_classes=8)
+    model = nn.Sequential(FeatureModel(), classifier).to(device)
+
+    # Load the model
+    model.load_state_dict(torch.load(model_path, map_location=device))
+    
+    # Inference
+    model.eval()
+    with torch.no_grad():
+        pred = model(feature.unsqueeze(1).to(device)) # input dim : (batch, channel, length)
+        emotion_pred = torch.argmax(pred, dim=1)
+        for idx, pred in enumerate(emotion_pred):
+            print(f"Prediction for {idx+1}th segment: {pred.item()}")
+
+    print(f"Time taken for inference: {time()-time_per_data:.2f} seconds")
+    # return most frequent emotion
+    return emotions_list[emotion_pred.mode().values.item()]
 
 if __name__ == '__main__':
     while True:
         # Custom Input
         data_path = input("Enter the path of the audio file: ")
-        time_per_data = time()
-        # data_path = './test_data/calmed1.wav'
-        train_data_type = 'iemocap'
-        emotions_list = ['ang', 'hap', 'exc', 'sad', 'neu', 'fea', 'sur']
-        model_path = './test_data/best_model_iemocap.pth'
-        parallel = 'threading'
-
-        # Extract features from the audio
-        feature_extraction_start = time()
-        if parallel:
-            features_list = extract_features_from_audio_parallel(data_path, parallel)
-        else:
-            features_list = extract_features_from_audio(data_path)
-        feature = torch.tensor(np.array(features_list), dtype=torch.float32)
-        print(f"Feature extraction: {time()-feature_extraction_start:.2f} seconds")
-
-        # Define the model, device
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        classifier = IemoClassifier(num_classes=7) if train_data_type == "iemocap" else RavClassifier(num_classes=8)
-        model = nn.Sequential(FeatureModel(), classifier).to(device)
-
-        # Load the model
-        model.load_state_dict(torch.load(model_path, map_location=device))
-        
-        # Inference
-        model.eval()
-        with torch.no_grad():
-            pred = model(feature.unsqueeze(1).to(device)) # input dim : (batch, channel, length)
-            emotion_pred = torch.argmax(pred, dim=1)
-            for idx, pred in enumerate(emotion_pred):
-                print(f"Prediction for {idx+1}th segment: {pred.item()}")
-
-        print(f"Time taken for inference: {time()-time_per_data:.2f} seconds")
-
-
+        print(f'Predicted emotion: {run_test(data_path)}')

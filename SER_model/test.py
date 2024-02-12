@@ -150,4 +150,4 @@ if __name__ == '__main__':
     while True:
         # Custom Input
         data_path = input("Enter the path of the audio file: ")
-        print(f'Predicted emotion: {run_test(data_path)}')
+        print(f'Predicted emotion : {run_test(data_path)}')

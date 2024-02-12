@@ -20,4 +20,5 @@ COPY . /root/code
 WORKDIR /root/code
 # run following command
 # uvicorn app:app --host 0.0.0.0 --port 8000
-ENTRYPOINT ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+EXPOSE 8080
+ENTRYPOINT ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]

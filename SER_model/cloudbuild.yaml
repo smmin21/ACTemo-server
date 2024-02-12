@@ -1,0 +1,37 @@
+substitutions:
+  _PROJECT_ID: actemo-demo
+  _IMAGE_NAME: actemo-image
+  _REGION: asia-northeast1
+  _SERVICE_NAME: actemo-server
+
+steps:
+
+### 1. Build the Docker image
+  - id: "build image"
+    name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-f", "Dockerfile.prod", "-t", "gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:$COMMIT_SHA", "."]
+
+### 2. Push 
+  - id: "push image"
+    name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:$COMMIT_SHA"]
+
+## 3. Deploy
+  - id: "deploy prod service"
+    name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args: ["run", "deploy", "${_SERVICE_NAME}", "--image", "gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:$COMMIT_SHA", "--port", "8080", "--region", "${_REGION}"]
+
+images:
+  - 'gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:$COMMIT_SHA'
+
+
+
+
+# # 5. Google Cloud Run
+# gcloud run deploy actemo-server --image asia-northeast1-docker.pkg.dev/actemo-demo/actemo-repo/actemo-image --port 8080 --project actemo-demo
+
+# steps:
+# - name: 'gcr.io/cloud-builders/docker'
+#   script: |
+#     gcloud run deploy actemo-server --image asia-northeast1-docker.pkg.dev/actemo-demo/actemo-repo/actemo-image --region asia-northeast1 managed --allow-unauthenticated

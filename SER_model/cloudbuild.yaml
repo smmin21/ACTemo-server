@@ -1,7 +1,7 @@
 substitutions:
   # _PROJECT_ID: actemo-demo
   # _IMAGE_NAME: actemo-image
-  # _REGION: asia-northeast1
+  _REGION: asia-northeast1
   _SERVICE_NAME: actemo-server
 
 steps:  

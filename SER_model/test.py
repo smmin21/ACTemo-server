@@ -114,7 +114,7 @@ def run_test(data_path):
     # Custom Input
     train_data_type = 'iemocap'
     emotions_list = ['ang', 'hap', 'exc', 'sad', 'neu', 'fea', 'sur']
-    model_path = './test_data/best_model_iemocap.pth'
+    model_path = './models/model_finetuned.pth'
     parallel = 'threading'
 
     # Extract features from the audio

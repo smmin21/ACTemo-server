@@ -19,7 +19,7 @@ steps:
   - id: "deploy prod service"
     name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: gcloud
-    args: ["run", "deploy", "${_SERVICE_NAME}", "--image", "gcr.io/PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA", "--port", "8080", "--region", "${_REGION}"]
+    args: ["run", "deploy", "${_SERVICE_NAME}", "--image", "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA", "--port", "8080", "--region", "${_REGION}"]
 
 images:
   - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA'

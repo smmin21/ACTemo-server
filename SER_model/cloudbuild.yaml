@@ -8,7 +8,7 @@ steps:
 ### 1. Build the Docker image
   - id: "build image"
     name: "gcr.io/cloud-builders/docker"
-    args: ["build", "-f", "Dockerfile.prod", "-t", "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA", "."]
+    args: ["build", "-f", "./SER_model/Dockerfile.prod", "-t", "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA", "."]
 
 ### 2. Push 
   - id: "push image"

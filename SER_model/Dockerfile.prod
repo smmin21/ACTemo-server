@@ -14,7 +14,7 @@ RUN pip install numpy pandas librosa tqdm torchaudio fastapi uvicorn python-mult
 # RUN curl https://example-url/path-to-data/data-filename --output /root/data-filename
 
 # Copies the trainer code to the docker image.
-COPY . /root/code
+COPY SER_model/ /root/code
 
 # Sets up the entry point to invoke the trainer.
 WORKDIR /root/code

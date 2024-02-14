@@ -5,7 +5,6 @@ substitutions:
   _SERVICE_NAME: actemo-server
 
 steps:
-
 ### 1. Build the Docker image
   - id: "build image"
     name: "gcr.io/cloud-builders/docker"

@@ -109,10 +109,16 @@ def multithreading_method(waveform_chunks, rate, features_list):
         thread.join()
     return features_list
 
-def run_test(data_path):
+def run_test(data_path, emotion='Angry'):
     time_per_data = time()
     # Custom Input
     train_data_type = 'iemocap'
+    emotion2idx = {'Angry': 0, 'Distressed': 0, 
+                   'Content': 1, 'Happy': 1, 
+                   'Excited': 2, 'Joyous': 2, 
+                   'Depressed': 3, 'Sad': 3, 
+                   'Bored': 4, 'Calm': 4, 'Relaxed': 4, 'Sleepy': 4, 
+                   'Afraid': 5, 'Surprised': 6}
     emotions_list = ['ang', 'hap', 'exc', 'sad', 'neu', 'fea', 'sur']
     model_path = './models/model_finetuned.pth'
     parallel = 'threading'
@@ -138,6 +144,14 @@ def run_test(data_path):
     model.eval()
     with torch.no_grad():
         pred = model(feature.unsqueeze(1).to(device)) # input dim : (batch, channel, length)
+        # Get the specific emotion score (!important)
+        specific_emotion_score = pred[:, emotion2idx[emotion]]
+        print(f"Specific emotion score: {specific_emotion_score}")
+        sum_specific_emotion_score = specific_emotion_score.sum()
+        print(f"Sum Specific emotion score: {sum_specific_emotion_score:.2f}")
+        sort_specific_emotion_score = torch.sort(specific_emotion_score, descending=True)
+        print(f"Sum Specific emotion score except edge: {sort_specific_emotion_score.values[1:-1].sum():.2f}")
+        # Get the most profitable prediction (general)
         emotion_pred = torch.argmax(pred, dim=1)
         for idx, pred in enumerate(emotion_pred):
             print(f"Prediction for {idx+1}th segment: {pred.item()}")
@@ -149,5 +163,14 @@ def run_test(data_path):
 if __name__ == '__main__':
     while True:
         # Custom Input
-        data_path = input("Enter the path of the audio file: ")
-        print(f'Predicted emotion : {run_test(data_path)}')
+        # select_emotion = input("Enter the emotion: ")
+        # data_path = input("Enter the path of the audio file: ")
+        # print(f'Predicted emotion : {run_test(data_path, select_emotion)}')
+
+        # print(f'Predicted emotion : {run_test("./test_data/연세로.m4a", "Distressed")}')
+        # print(f'Predicted emotion : {run_test("./test_data/연세로 2.m4a", "Distressed")}')
+        print(f'Predicted emotion : {run_test("./test_data/연세로 3.m4a", "Angry")}')
+        print(f'Predicted emotion : {run_test("./test_data/연세로 4.m4a", "Angry")}')
+        print(f'Predicted emotion : {run_test("./test_data/연세로 6.m4a", "Angry")}')
+
+        exit()

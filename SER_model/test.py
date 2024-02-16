@@ -158,12 +158,15 @@ def run_test(data_path, emotion='Angry'):
         # 3. Get emotion rank and evaluate the level
         top_emotions = torch.argsort(pred, dim=1, descending=True)[:, :2]  # Top 2 emotions
         top_emotions_count = torch.bincount(top_emotions.flatten(), minlength=len(emotions_list))
+        zero_indices = torch.nonzero(top_emotions_count == 0).flatten()
         sorted_indices = torch.argsort(top_emotions_count, descending=True)
         sorted_emotions = [emotions_list[idx] for idx in sorted_indices]
+        print(f"Top emotions count: {top_emotions_count}")
         print(f"Frequency rank of top emotions: {sorted_emotions}")
         # [level] A: 1st, B: 2nd ~ 4th, C: 5th ~ 7th
         level_idx = sorted_emotions.index(emotions_list[emotion2idx[emotion]])
         level = 'A' if level_idx == 0 else 'B' if 1 <= level_idx <= 3 else 'C'
+        level = 'C' if emotion2idx[emotion] in zero_indices else level
         print(f"Level of prediction: {level}")
         
     print(f"Time taken for inference: {time()-time_per_data:.2f} seconds")

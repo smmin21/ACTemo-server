@@ -11,9 +11,9 @@ async def predict(file: UploadFile = File(...), emotion: str = Form(...)):
     audio_data = await file.read()
 
     # Run the test
-    response = run_test(io.BytesIO(audio_data), emotion)
-    print(f'Predicted emotion in API: {response}')
+    predicted_emotion, level = run_test(io.BytesIO(audio_data), emotion)
+    print(f'Predicted emotion in API: {predicted_emotion}, Level: {level}')
 
     # Return the response
-    return JSONResponse(content={"emotion": response})
+    return JSONResponse(content={"level": level})
 

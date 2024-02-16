@@ -144,33 +144,38 @@ def run_test(data_path, emotion='Angry'):
     model.eval()
     with torch.no_grad():
         pred = model(feature.unsqueeze(1).to(device)) # input dim : (batch, channel, length)
-        # Get the specific emotion score (!important)
-        specific_emotion_score = pred[:, emotion2idx[emotion]]
-        print(f"Specific emotion score: {specific_emotion_score}")
-        sum_specific_emotion_score = specific_emotion_score.sum()
-        print(f"Sum Specific emotion score: {sum_specific_emotion_score:.2f}")
-        sort_specific_emotion_score = torch.sort(specific_emotion_score, descending=True)
-        print(f"Sum Specific emotion score except edge: {sort_specific_emotion_score.values[1:-1].sum():.2f}")
-        # Get the most profitable prediction (general)
-        emotion_pred = torch.argmax(pred, dim=1)
-        for idx, pred in enumerate(emotion_pred):
-            print(f"Prediction for {idx+1}th segment: {pred.item()}")
 
+        # 1. Get the label emotion statistics
+        specific_emotion_score = pred[:, emotion2idx[emotion]]
+        sort_specific_emotion_score = torch.sort(specific_emotion_score, descending=True)
+        print(f"Specific emotion score: {specific_emotion_score}")
+        print(f"Mean Specific emotion score: {specific_emotion_score.mean():.2f}")
+        print(f"Mean Specific emotion score except edge: {sort_specific_emotion_score.values[1:-1].mean():.2f}")
+
+        # 2. Get the most profitable prediction (general)
+        emotion_pred = torch.argmax(pred, dim=1)
+
+        # 3. Get emotion rank and evaluate the level
+        top_emotions = torch.argsort(pred, dim=1, descending=True)[:, :2]  # Top 2 emotions
+        top_emotions_count = torch.bincount(top_emotions.flatten(), minlength=len(emotions_list))
+        sorted_indices = torch.argsort(top_emotions_count, descending=True)
+        sorted_emotions = [emotions_list[idx] for idx in sorted_indices]
+        print(f"Frequency rank of top emotions: {sorted_emotions}")
+        # [level] A: 1st, B: 2nd ~ 4th, C: 5th ~ 7th
+        level_idx = sorted_emotions.index(emotions_list[emotion2idx[emotion]])
+        level = 'A' if level_idx == 0 else 'B' if 1 <= level_idx <= 3 else 'C'
+        print(f"Level of prediction: {level}")
+        
     print(f"Time taken for inference: {time()-time_per_data:.2f} seconds")
-    # return most frequent emotion
-    return emotions_list[emotion_pred.mode().values.item()]
+    # predicted emotion, level
+    return emotions_list[emotion_pred.mode().values.item()], level
 
 if __name__ == '__main__':
     while True:
         # Custom Input
-        # select_emotion = input("Enter the emotion: ")
-        # data_path = input("Enter the path of the audio file: ")
-        # print(f'Predicted emotion : {run_test(data_path, select_emotion)}')
+        select_emotion = input("Enter the emotion: ")
+        data_path = input("Enter the path of the audio file: ")
+        predicted_emotion, level = run_test(data_path, select_emotion)
+        print(f'[FINAL] Predicted emotion : {predicted_emotion}, Level: {level}')
 
-        # print(f'Predicted emotion : {run_test("./test_data/연세로.m4a", "Distressed")}')
-        # print(f'Predicted emotion : {run_test("./test_data/연세로 2.m4a", "Distressed")}')
-        print(f'Predicted emotion : {run_test("./test_data/연세로 3.m4a", "Angry")}')
-        print(f'Predicted emotion : {run_test("./test_data/연세로 4.m4a", "Angry")}')
-        print(f'Predicted emotion : {run_test("./test_data/연세로 6.m4a", "Angry")}')
-
-        exit()
+       

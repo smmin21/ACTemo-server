@@ -1,0 +1,9 @@
+SER_model/datasets/*.csv
+SER_model/datasets/ravdess
+mp3_combine
+mp3_individual
+*.zip
+.DS_Store
+SER_model/test_data
+.gitignore
+.git

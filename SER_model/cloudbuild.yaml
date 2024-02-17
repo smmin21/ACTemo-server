@@ -5,10 +5,24 @@ substitutions:
   _SERVICE_NAME: actemo-server
 
 steps:  
+### 0. Pull the latest image
+  - id: "pull latest image"
+    name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest || exit 0"]
+    
 ### 1. Build the Docker image
   - id: "build image"
     name: "gcr.io/cloud-builders/docker"
-    args: ["build", "-f", "./SER_model/Dockerfile.prod", "-t", "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA", "."]
+    args: 
+      - "build"
+      - "-f"
+      - "./SER_model/Dockerfile.prod"
+      - "-t"
+      - "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA"
+      - "--cache-from"
+      - "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest"
+      - "."
 
 ### 2. Push 
   - id: "push image"

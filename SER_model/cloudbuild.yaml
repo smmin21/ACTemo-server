@@ -13,16 +13,12 @@ steps:
 
 ### 1. Build the Docker image
   - id: "build image"
-    name: "gcr.io/cloud-builders/docker"
+    name: "gcr.io/kaniko-project/executor:latest"
     args: 
-      - "build"
-      - "-f"
-      - "./SER_model/Dockerfile.prod"
-      - "-t"
-      - "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA"
-      - "--cache-from"
-      - "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest"
-      - "."
+      - --destination=gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA
+      - --cache=true
+      - --cache-ttl=168h
+      - --dockerfile=./SER_model/Dockerfile.prod
 
 ### 2. Push 
   - id: "push image"

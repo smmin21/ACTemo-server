@@ -21,9 +21,9 @@ steps:
       - --dockerfile=./SER_model/Dockerfile.prod
 
 ### 2. Push 
-  - id: "push image"
-    name: "gcr.io/cloud-builders/docker"
-    args: ["push", "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA"]
+  # - id: "push image"
+  #   name: "gcr.io/cloud-builders/docker"
+  #   args: ["push", "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA"]
 
 ## 3. Deploy
   - id: "deploy prod service"

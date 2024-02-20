@@ -4,14 +4,17 @@
 # docker run -it --rm --name actemo-dev -p 8000:8000 -v $(pwd):/root/code actemo:dev /bin/bash
 
 # Specifies base image and tag
-FROM pytorch/pytorch:latest
+FROM python:3.8-slim-buster
 WORKDIR /root
 
-# Installs additional packages
-RUN pip install numpy pandas librosa tqdm torchaudio fastapi uvicorn python-multipart
+# Update the package lists and install sudo
+RUN apt-get update && apt-get install -y sudo
+# Install ffmpeg
+RUN sudo apt-get install -y ffmpeg
 
-# Downloads training data
-# RUN curl https://example-url/path-to-data/data-filename --output /root/data-filename
+# Installs additional packages
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
 # Sets up the entry point to invoke the trainer.
 WORKDIR /root/code

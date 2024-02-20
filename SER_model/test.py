@@ -2,7 +2,6 @@ import torchaudio
 import torch.nn as nn
 from datasets.feature_extraction import extract_features, extract_features_parallel
 from models.model import FeatureModel, IemoClassifier, RavClassifier
-import pandas as pd
 import numpy as np
 import torch
 import pdb

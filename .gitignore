@@ -5,3 +5,5 @@ mp3_individual
 *.zip
 *.DS_Store
 SER_model/test_data
+### Python ###
+__pycache__/

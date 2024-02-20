@@ -19,8 +19,6 @@ steps:
       - --cache=true
       - --cache-ttl=168h
       - --dockerfile=./SER_model/Dockerfile.prod
-      - --compressed-caching=false
-      - --cache-copy-layers=true
 
 ### 2. Push 
   # - id: "push image"

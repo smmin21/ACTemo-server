@@ -12,20 +12,23 @@ steps:
   #   args: ["-c", "docker pull gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest || exit 0"]
 
 ### 1. Build the Docker image
+  # - id: "build image"
+  #   name: "gcr.io/kaniko-project/executor:latest"
+  #   args: 
+  #     - --destination=gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA
+  #     - --cache=true
+  #     - --cache-ttl=168h
+  #     - --dockerfile=./SER_model/Dockerfile.prod
+  #     - --compressed-caching=false
+  #     - --cache-copy-layers=true
   - id: "build image"
-    name: "gcr.io/kaniko-project/executor:latest"
-    args: 
-      - --destination=gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA
-      - --cache=true
-      - --cache-ttl=168h
-      - --dockerfile=./SER_model/Dockerfile.prod
-      - --compressed-caching=false
-      - --cache-copy-layers=true
+    name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA", "-f", "SER_model/Dockerfile.prod", "."]
 
 ### 2. Push 
-  # - id: "push image"
-  #   name: "gcr.io/cloud-builders/docker"
-  #   args: ["push", "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA"]
+  - id: "push image"
+    name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA"]
 
 ## 3. Deploy
   - id: "deploy prod service"
@@ -33,8 +36,8 @@ steps:
     entrypoint: gcloud
     args: ["run", "deploy", "${_SERVICE_NAME}", "--image", "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA", "--port", "8080", "--region", "${_REGION}"]
 
-# images:
-#   - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA'
+images:
+  - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA'
 
 options:
   logging: CLOUD_LOGGING_ONLY 

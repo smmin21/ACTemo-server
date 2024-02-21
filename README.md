@@ -4,14 +4,14 @@
 <details>
 <summary>Table of Contents</summary>
 
-- [🔮 Features](#🔮-features)
-- [🛳 Running `ACTion` with Docker](#🛳-running-action-with-docker)
-  - [🚀 Make Your Own API Server](#🚀-make-your-own-api-server)
+- [🔮 Features](#-features)
+- [🛳 Running `ACTion` with Docker](#-running-action-with-docker)
+  - [🚀 Make Your Own API Server](#-make-your-own-api-server)
     - [`1` API Request Example](#1-api-request-example)
     - [`2` API Response Example](#2-api-response-example)
-- [🧩 Just Want to Test the Model](#🧩-just-want-to-test-the-model)
+- [🧩 Just Want to Test the Model](#-just-want-to-test-the-model)
   - [Execute Tests](#execute-tests)
-- [🔗 Link to Other Parts](#🔗-link-to-other-parts)
+- [🔗 Link to Other Parts](#-link-to-other-parts)
 
 </details>
 
@@ -60,7 +60,7 @@ The response is returned in JSON format, with each audio assigned a grade, such 
 
 ---
 
-### 🧩 Just Want to Test  the Model
+### 🧩 Just Want to Test the Model
 If you simply want to train or test the model without deploying the API server, follow these steps:
 ```bash
 # 1. Build docker image

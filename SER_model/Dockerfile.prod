@@ -14,7 +14,7 @@ RUN sudo apt-get install -y ffmpeg
 
 # Installs additional packages
 COPY requirements.txt .
-RUN pip install --progress -r requirements.txt
+RUN pip install --progress-bar=on -r requirements.txt
 
 # Copies the trainer code to the docker image.
 COPY SER_model/ /root/code

@@ -6,10 +6,10 @@ substitutions:
 
 steps:  
 ### 0. Pull the latest image
-  # - id: "pull latest image"
-  #   name: "gcr.io/cloud-builders/docker"
-  #   entrypoint: "bash"
-  #   args: ["-c", "docker pull gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest || exit 0"]
+  - id: "pull latest image"
+    name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest || exit 0"]
 
 ### 1. Build the Docker image
   - id: "build image"
@@ -18,7 +18,8 @@ steps:
       "build", 
       "-t", "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA", 
       "-f", "SER_model/Dockerfile.prod", 
-      "--cache-from", "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest", "."
+      "--cache-from", "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest", 
+      "--pull", "false", "."
       ]
 
 ### 2. Push 

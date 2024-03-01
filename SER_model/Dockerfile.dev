@@ -4,19 +4,19 @@
 # docker run -it --rm --name actemo-dev -p 8000:8000 -v $(pwd):/root/code actemo:dev /bin/bash
 
 # Specifies base image and tag
-FROM python:3.8-slim-buster
+FROM python:3.8-slim-buster as base
 WORKDIR /root
 
 # Update the package lists and install sudo
-RUN apt-get update && apt-get install -y sudo
+RUN apt-get update && apt-get install -y sudo ffmpeg && rm -rf /var/lib/apt/lists/*
 # Install ffmpeg
-RUN sudo apt-get install -y ffmpeg
-
-# Installs additional packages
+FROM base as builder
 COPY requirements.txt .
-RUN pip install --progress-bar=on -r requirements.txt
+RUN pip install --user --progress-bar=on -r requirements.txt
 
-# Sets up the entry point to invoke the trainer.
+FROM base as final
+COPY --from=builder /root/.local /root/.local
+ENV PATH=/root/.local/bin:$PATH
 WORKDIR /root/code
 # ENTRYPOINT ["python", "train.py"]
 

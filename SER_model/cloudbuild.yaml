@@ -19,7 +19,7 @@ steps:
       "-t", "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA", 
       "-f", "SER_model/Dockerfile.prod", 
       "--cache-from", "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest", 
-      "--pull", "false", "."
+      "--pull=false", "."
       ]
 
 ### 2. Push 

@@ -24,8 +24,6 @@ RUN apt-get update && \
 COPY --from=builder /usr/local /usr/local
 # Copy the source code
 COPY SER_model/ .
-# Set the environment variable
-# ENV PATH=/root/.local/bin:$PATH
 
 # run following command
 # uvicorn app:app --host 0.0.0.0 --port 8000

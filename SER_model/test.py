@@ -145,6 +145,7 @@ def run_test(data_path, emotion='Angry'):
         pred = model(feature.unsqueeze(1).to(device)) # input dim : (batch, channel, length)
 
         # 1. Get the label emotion statistics
+        pred = nn.functional.softmax(pred, dim=1)
         specific_emotion_score = pred[:, emotion2idx[emotion]]
         sort_specific_emotion_score = torch.sort(specific_emotion_score, descending=True)
         print(f"Specific emotion score: {specific_emotion_score}")

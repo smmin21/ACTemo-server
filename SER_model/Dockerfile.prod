@@ -9,9 +9,8 @@ WORKDIR /root
 
 # Install python packages
 COPY requirements.txt .
-RUN python -m venv /opt/venv && \
-    /opt/venv/bin/pip install --progress-bar=on --no-cache-dir -r requirements.txt && \
-    /opt/venv/bin/pip install --no-cache-dir torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+RUN pip install --user --progress-bar=on --no-cache-dir -r requirements.txt && \
+    pip install --user --no-cache-dir torch torchaudio --index-url https://download.pytorch.org/whl/cpu
 
 # Start a new build stage
 FROM python:3.8-slim-buster as runner
@@ -22,11 +21,11 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Copies the python packages from the builder stage
-COPY --from=builder /opt/venv /opt/venv
+COPY --from=builder /root/.local /root/.local
 # Copy the source code
 COPY SER_model/ .
 # Set the environment variable
-ENV PATH=/opt/venv/bin:$PATH
+ENV PATH=/root/.local/bin:$PATH
 
 # run following command
 # uvicorn app:app --host 0.0.0.0 --port 8000

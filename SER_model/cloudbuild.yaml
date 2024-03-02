@@ -1,33 +1,19 @@
 substitutions:
   # _PROJECT_ID: actemo-demo
-  # _IMAGE_NAME: actemo-image
   _REGION: asia-northeast1
   _SERVICE_NAME: actemo-server
 
 steps:  
-### 0. Pull the latest image
-  - id: "pull latest image"
-    name: "gcr.io/cloud-builders/docker"
-    entrypoint: "bash"
-    args: ["-c", "docker pull gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest || exit 0"]
-
 ### 1. Build the Docker image
   - id: "build image"
-    name: "gcr.io/cloud-builders/docker"
-    args: [
-      "build", 
-      "--cache-from", "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest",
-      "-t", "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA", 
-      "-f", "SER_model/Dockerfile.prod", 
-      "."
-      ]
+    name: "gcr.io/kaniko-project/executor:latest"
+    args: 
+      - --destination=gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA
+      - --cache=true
+      - --cache-ttl=168h
+      - --dockerfile=SER_model/Dockerfile.prod
 
-### 2. Push 
-  - id: "push image"
-    name: "gcr.io/cloud-builders/docker"
-    args: ["push", "gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA"]
-
-## 3. Deploy
+## 2. Deploy
   - id: "deploy prod service"
     name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: gcloud

@@ -1,22 +1,25 @@
 # 1. 도커 이미지 빌드
-# docker build -f Dockerfile.dev -t actemo:dev .
+# docker build -f SER_model/Dockerfile.dev -t actemo:dev .
 # 2. 도커 컨테이너 실행
-# docker run -it --rm --name actemo-dev -p 8000:8000 -v $(pwd):/root/code actemo:dev /bin/bash
+# docker run -it --rm --name actemo-dev -p 8000:8000 -v $(pwd)/SER_model:/root/code actemo:dev /bin/bash
 
 # Specifies base image and tag
-FROM python:3.8-slim-buster as base
+FROM python:3.8-slim-buster as builder 
 WORKDIR /root
 
-# Update the package lists and install sudo
-RUN apt-get update && apt-get install -y sudo ffmpeg && rm -rf /var/lib/apt/lists/*
-# Install ffmpeg
-FROM base as builder
+# Install python packages
 COPY requirements.txt .
-RUN pip install --user --progress-bar=on -r requirements.txt
+RUN pip install --progress-bar=on -r requirements.txt && \
+    pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
 
-FROM base as final
-COPY --from=builder /root/.local /root/.local
-ENV PATH=/root/.local/bin:$PATH
+FROM python:3.8-slim-buster as runner
 WORKDIR /root/code
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ffmpeg && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /usr/local /usr/local
+# COPY SER_model/ .
 # ENTRYPOINT ["python", "train.py"]
 

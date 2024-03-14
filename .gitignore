@@ -7,3 +7,4 @@ mp3_individual
 SER_model/test_data
 ### Python ###
 __pycache__/
+*.log

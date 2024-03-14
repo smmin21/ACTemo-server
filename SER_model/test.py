@@ -8,7 +8,9 @@ import pdb
 from time import time
 import multiprocessing
 import threading
+import logging
 
+logging.basicConfig(filename='test.log', filemode='a', format='%(asctime)s - %(message)s', level=logging.INFO)
 
 def extract_features_from_audio(data_path):
     # Load the audio file
@@ -99,8 +101,15 @@ def multiprocessing_method2(waveform_chunks, rate, features_list):
 def multithreading_method(waveform_chunks, rate, features_list):
     # Method 3 : Using threading
     threads = []
+    lock = threading.Lock()
+
+    def thread_task(chunk):
+        feature = extract_features(chunk, rate)
+        with lock:
+            features_list.append(feature)
+
     for chunk in waveform_chunks:
-        thread = threading.Thread(target=lambda x: features_list.append(extract_features(x, rate)), args=(chunk,))
+        thread = threading.Thread(target=thread_task, args=(chunk,))
         threads.append(thread)
         thread.start()
 
@@ -109,7 +118,11 @@ def multithreading_method(waveform_chunks, rate, features_list):
     return features_list
 
 def run_test(data_path, emotion='Angry'):
+    # Logging
+    logging.info("=====================================")
+    logging.info(f"Test for [{data_path}] with emotion [{emotion}] started")
     time_per_data = time()
+
     # Custom Input
     train_data_type = 'iemocap'
     emotion2idx = {'Angry': 0, 'Distressed': 0, 
@@ -130,6 +143,7 @@ def run_test(data_path, emotion='Angry'):
         features_list = extract_features_from_audio(data_path)
     feature = torch.tensor(np.array(features_list), dtype=torch.float32)
     print(f"Feature extraction: {time()-feature_extraction_start:.2f} seconds")
+    logging.info(f"Feature extraction: {time()-feature_extraction_start:.2f} seconds")
 
     # Define the model, device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -170,15 +184,32 @@ def run_test(data_path, emotion='Angry'):
         print(f"Level of prediction: {level}")
         
     print(f"Time taken for inference: {time()-time_per_data:.2f} seconds")
+    logging.info(f"Time taken for inference: {time()-time_per_data:.2f} seconds")
     # predicted emotion, level
     return emotions_list[emotion_pred.mode().values.item()], level
 
 if __name__ == '__main__':
-    while True:
-        # Custom Input
-        select_emotion = input("Enter the emotion: ")
-        data_path = input("Enter the path of the audio file: ")
-        predicted_emotion, level = run_test(data_path, select_emotion)
-        print(f'[FINAL] Predicted emotion : {predicted_emotion}, Level: {level}')
+    # Logging 
+    logging.info("")
+    logging.info("=====================================")
+    logging.info("========== Test Started =============")
+
+    # while True:
+    #     # Custom Input
+    #     select_emotion = input("Enter the emotion: ")
+    #     data_path = input("Enter the path of the audio file: ")
+    #     predicted_emotion, level = run_test(data_path, select_emotion)
+    #     print(f'[FINAL] Predicted emotion : {predicted_emotion}, Level: {level}')
+
+    print("Angry 1 Test")
+    run_test('test_data/angry1.wav', 'Angry')
+    print("Angry 2 Test")
+    run_test('test_data/angry1.wav', 'Angry')
+    print("Angry 3 Test")
+    run_test('test_data/angry1.wav', 'Angry')
+    print("Afraid 1 Test")
+    run_test('test_data/afraid1.wav', 'Afraid')
+    print("Afraid 2 Test")
+    run_test('test_data/afraid1.wav', 'Afraid')
 
        

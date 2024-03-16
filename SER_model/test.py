@@ -133,7 +133,7 @@ def run_test(data_path, emotion='Angry'):
                    'Afraid': 5, 'Surprised': 6}
     emotions_list = ['ang', 'hap', 'exc', 'sad', 'neu', 'fea', 'sur']
     model_path = './models/model_finetuned.pth'
-    parallel = 'threading'
+    parallel = None
 
     # Extract features from the audio
     feature_extraction_start = time()
